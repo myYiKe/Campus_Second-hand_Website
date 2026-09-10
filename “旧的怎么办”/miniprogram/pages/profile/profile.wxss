@@ -1,0 +1,3 @@
+.stat-card-value {
+  font-size: 30rpx;
+}

@@ -1,0 +1,31 @@
+<view class="page sticky-safe">
+  <view wx:if="{{!loggedIn}}" class="card">
+    <view class="section-title">消息中心</view>
+    <view class="section-subtitle">登录后查看和卖家的沟通记录</view>
+    <button class="btn-primary btn-block" style="margin-top: 20rpx;" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:else>
+    <view class="card" wx:if="{{context}}">
+      <view class="section-title">当前咨询商品</view>
+      <view class="section-subtitle">{{context.itemTitle || '商品咨询'}} · 卖家 {{context.sellerName || '校园用户'}}</view>
+      <view class="form-grid" style="margin-top: 20rpx;">
+        <textarea class="field-textarea" placeholder-class="textarea-placeholder" placeholder="输入想咨询的问题，例如成色、面交时间、是否还能刀价" value="{{draft}}" bindinput="onDraftInput"></textarea>
+        <button class="btn-primary btn-block" bindtap="sendMessage">发送消息</button>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">聊天记录</view>
+      <view class="section-subtitle">当前先展示最近消息，后续再补完整会话分组</view>
+      <view wx:if="{{messages.length}}" class="list-stack" style="margin-top: 20rpx;">
+        <view wx:for="{{messages}}" wx:key="id" class="message-card">
+          <view class="muted">商品ID：{{item.itemId || '-'}}</view>
+          <view style="margin-top: 8rpx;">{{item.content || item.text || '暂无内容'}}</view>
+          <view class="section-subtitle">{{item.createdAt}}</view>
+        </view>
+      </view>
+      <view wx:else class="empty-box" style="margin-top: 20rpx;">暂时还没有聊天记录。</view>
+    </view>
+  </block>
+</view>

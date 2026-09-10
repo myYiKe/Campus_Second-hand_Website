@@ -1,0 +1,105 @@
+<view class="page sticky-safe">
+  <view wx:if="{{!loggedIn}}" class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">账号中心</view>
+        <view class="section-subtitle">小程序端仅保留昵称密码登录，不开放管理员登录</view>
+      </view>
+    </view>
+    <view class="button-row">
+      <button class="{{authMode === 'login' ? 'btn-primary' : 'btn-secondary'}}" data-mode="login" bindtap="switchAuthMode">登录</button>
+      <button class="{{authMode === 'register' ? 'btn-primary' : 'btn-secondary'}}" data-mode="register" bindtap="switchAuthMode">注册</button>
+    </view>
+
+    <view wx:if="{{authMode === 'login'}}" class="form-grid" style="margin-top: 20rpx;">
+      <view class="field-block">
+        <view class="field-label">昵称</view>
+        <input class="field-input" placeholder-class="input-placeholder" placeholder="请输入昵称" value="{{loginForm.nickname}}" data-field="nickname" bindinput="onLoginInput" />
+      </view>
+      <view class="field-block">
+        <view class="field-label">密码</view>
+        <input class="field-input" password placeholder-class="input-placeholder" placeholder="请输入密码" value="{{loginForm.password}}" data-field="password" bindinput="onLoginInput" />
+      </view>
+      <button class="btn-primary btn-block" bindtap="submitLogin">立即登录</button>
+    </view>
+
+    <view wx:else class="form-grid" style="margin-top: 20rpx;">
+      <view class="field-block">
+        <view class="field-label">昵称</view>
+        <input class="field-input" placeholder-class="input-placeholder" placeholder="请输入昵称" value="{{registerForm.nickname}}" data-field="nickname" bindinput="onRegisterInput" />
+      </view>
+      <view class="field-block">
+        <view class="field-label">密码</view>
+        <input class="field-input" password placeholder-class="input-placeholder" placeholder="请输入密码" value="{{registerForm.password}}" data-field="password" bindinput="onRegisterInput" />
+      </view>
+      <view class="field-block">
+        <view class="field-label">确认密码</view>
+        <input class="field-input" password placeholder-class="input-placeholder" placeholder="请再次输入密码" value="{{registerForm.confirmPassword}}" data-field="confirmPassword" bindinput="onRegisterInput" />
+      </view>
+      <button class="btn-primary btn-block" bindtap="submitRegister">注册并登录</button>
+    </view>
+  </view>
+
+  <block wx:else>
+    <view class="card">
+      <view class="section-head">
+        <view>
+          <view class="section-title">{{profile.nickname || user.nickname}}</view>
+          <view class="section-subtitle">用户 ID：{{profile.userId}}</view>
+        </view>
+        <button class="btn-secondary" bindtap="logout">退出</button>
+      </view>
+      <view class="button-row" style="margin-bottom: 18rpx;">
+        <button class="btn-primary" bindtap="openOrders">我的订单</button>
+      </view>
+      <view class="stats-grid">
+        <view class="stat-card">
+          <text class="stat-value">{{profile.creditScore || 0}}</text>
+          <text class="section-subtitle">信用分</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-value">{{profile.campusVerified ? '已认证' : '未认证'}}</text>
+          <text class="section-subtitle">校园认证</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-value">{{profile.favoriteCount || 0}}</text>
+          <text class="section-subtitle">收藏数</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-value">{{profile.publishedItemCount || 0}}</text>
+          <text class="section-subtitle">发布数</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-head">
+        <view>
+          <view class="section-title">校园认证</view>
+          <view class="section-subtitle">
+            {{profile.campusVerified ? '当前账号已完成校园认证' : '下单和发布前需要先完成校园认证'}}
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{profile.campusVerified}}" class="form-grid">
+        <view class="record-card">
+          <view class="section-title" style="font-size: 28rpx;">已认证</view>
+          <view class="section-subtitle">你的账号已通过校园认证，可以正常发布和下单。</view>
+          <view wx:if="{{profile.studentNo}}" class="muted" style="margin-top: 12rpx;">学号：{{profile.studentNo}}</view>
+          <view wx:if="{{profile.campus}}" class="muted">校区：{{profile.campus}}</view>
+        </view>
+      </view>
+      <view wx:else class="form-grid">
+        <view class="field-block">
+          <view class="field-label">学号</view>
+          <input class="field-input" value="{{verifyForm.studentNo}}" bindinput="onStudentNoInput" />
+        </view>
+        <view class="field-block">
+          <view class="field-label">校区</view>
+          <input class="field-input" value="{{verifyForm.campus}}" bindinput="onCampusInput" />
+        </view>
+        <button class="btn-primary btn-block" bindtap="submitVerify">提交认证</button>
+      </view>
+    </view>
+  </block>
+</view>

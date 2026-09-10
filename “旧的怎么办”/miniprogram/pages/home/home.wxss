@@ -1,0 +1,8 @@
+.category-scroll {
+  white-space: nowrap;
+}
+
+.category-scroll .chip {
+  display: inline-flex;
+  margin-right: 12rpx;
+}

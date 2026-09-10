@@ -1,0 +1,39 @@
+<view class="page sticky-safe">
+  <view class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">购物车</view>
+        <view class="section-subtitle">支持批量选择和统一创建待支付订单</view>
+      </view>
+      <button class="btn-secondary" bindtap="toggleSelectAll">
+        {{selectedIds.length === cart.length && cart.length ? '取消全选' : '全选'}}
+      </button>
+    </view>
+
+    <view wx:if="{{cart.length}}" class="list-stack">
+      <view wx:for="{{cart}}" wx:key="id" class="record-card">
+        <view class="order-card-header">
+          <view>
+            <view class="section-title" style="font-size: 28rpx;">{{item.title}}</view>
+            <view class="muted">￥{{item.price}} · 库存 {{item.stock}} 件 · {{item.category}}</view>
+          </view>
+          <view class="inline-actions">
+            <button class="mini-outline" bindtap="toggleSelect" data-id="{{item.id}}">
+              {{selectedIds.includes(item.id) ? '已选中' : '选择'}}
+            </button>
+            <button class="mini-danger" bindtap="removeItem" data-id="{{item.id}}">移除</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-box">购物车还是空的，去首页挑点喜欢的商品吧。</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">结算信息</view>
+    <view class="muted">已选商品 {{selectedIds.length}} 件</view>
+    <view class="price" style="margin: 12rpx 0;">￥{{totalPrice}}</view>
+    <button class="btn-primary btn-block" bindtap="checkoutSelected">统一结算</button>
+  </view>
+</view>

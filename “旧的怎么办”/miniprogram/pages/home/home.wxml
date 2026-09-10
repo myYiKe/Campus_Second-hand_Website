@@ -1,0 +1,105 @@
+<view class="page sticky-safe">
+  <view class="card hero-card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">旧的怎么办</view>
+        <view class="section-subtitle">校园闲置好物，像逛京东一样快速浏览</view>
+      </view>
+      <button class="btn-light" bindtap="openProfile">{{loggedIn ? '我的账户' : '立即登录'}}</button>
+    </view>
+    <view class="search-row">
+      <input class="field-input" placeholder-class="input-placeholder" placeholder="搜索教材 / 平板 / 小冰箱" value="{{keyword}}" bindinput="onKeywordInput" confirm-type="search" bindconfirm="onSearch" />
+      <button class="btn-light" bindtap="onSearch">搜索</button>
+    </view>
+    <view class="button-row" style="margin-top: 18rpx;">
+      <picker range="{{campusOptions}}" bindchange="onCampusChange">
+        <view class="btn-light">{{currentCampus}}</view>
+      </picker>
+      <button class="btn-light" bindtap="goItems">进入商品频道</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">频道入口</view>
+        <view class="section-subtitle">按京东风格拆成更清晰的频道导航</view>
+      </view>
+    </view>
+    <view class="quick-grid">
+      <view wx:for="{{quickEntries}}" wx:key="key" class="quick-card" bindtap="onQuickTap" data-key="{{item.key}}">
+        <view class="section-title" style="font-size: 28rpx;">{{item.title}}</view>
+        <view class="section-subtitle">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">校园热搜</view>
+        <view class="section-subtitle">近期同学们最关注的求购关键词</view>
+      </view>
+    </view>
+    <view wx:if="{{wantedPosts.length}}" class="list-stack">
+      <view wx:for="{{wantedPosts}}" wx:key="id" class="list-card">
+        <view class="section-title" style="font-size: 28rpx;">{{item.title}}</view>
+        <view class="section-subtitle">预算 ￥{{item.budget || 0}} · {{item.publisherName || '校园用户'}}</view>
+        <view class="muted">{{item.description}}</view>
+      </view>
+    </view>
+    <view wx:else class="empty-box">暂无公开求购信息。</view>
+  </view>
+
+  <view class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">分类筛选</view>
+        <view class="section-subtitle">按分类快速定位商品</view>
+      </view>
+    </view>
+    <scroll-view scroll-x class="chip-row category-scroll">
+      <view
+        wx:for="{{categories}}"
+        wx:key="*this"
+        class="chip {{(currentCategory || '全部商品') === item ? 'active' : ''}}"
+        data-category="{{item}}"
+        bindtap="onCategoryTap"
+      >
+        {{item}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">首页推荐</view>
+        <view class="section-subtitle">首页只展示精选内容，完整列表放到“商品”tab</view>
+      </view>
+      <button class="btn-secondary" bindtap="goItems">更多商品</button>
+    </view>
+
+    <view wx:if="{{featuredItems.length}}" class="goods-grid">
+      <view wx:for="{{featuredItems}}" wx:key="id" class="goods-card" bindtap="viewItem" data-id="{{item.id}}">
+        <view class="goods-cover">
+          <image wx:if="{{item.imageUrl}}" class="goods-image" src="{{item.imageUrl}}" mode="aspectFill" />
+          <view wx:else class="goods-placeholder">暂无图片</view>
+          <view class="tag">{{item.category || '未分类'}}</view>
+          <view class="status-tag">{{item.statusText || '在售'}}</view>
+        </view>
+        <view class="goods-body">
+          <view class="goods-title">{{item.title}}</view>
+          <view class="goods-desc">{{item.description || '支持校内面交与在线沟通确认'}}</view>
+          <view class="goods-meta">卖家：{{item.sellerName || '校园用户'}}</view>
+          <view class="goods-meta">库存：{{item.stock}} 件</view>
+          <view class="price-row">
+            <view class="price">￥{{item.price}}</view>
+            <button class="mini-solid" catchtap="viewItem" data-id="{{item.id}}">查看详情</button>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-box">{{loading ? '商品加载中...' : '暂无商品，请稍后刷新。'}}</view>
+  </view>
+</view>

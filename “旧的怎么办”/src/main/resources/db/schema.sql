@@ -1,0 +1,199 @@
+CREATE TABLE IF NOT EXISTS user_account (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  openid VARCHAR(64),
+  unionid VARCHAR(64),
+  nickname VARCHAR(64),
+  avatar_url VARCHAR(512),
+  phone VARCHAR(64),
+  status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_auth (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  student_no VARCHAR(128),
+  campus VARCHAR(64),
+  realname_status VARCHAR(16) NOT NULL DEFAULT 'UNVERIFIED',
+  verified_at DATETIME,
+  salt VARCHAR(64),
+  password_md5 VARCHAR(64),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_auth_user (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS category (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(64) NOT NULL,
+  parent_id BIGINT DEFAULT 0,
+  sort_no INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  seller_id BIGINT NOT NULL,
+  category_id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  description TEXT NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  stock INT NOT NULL DEFAULT 1,
+  status VARCHAR(24) NOT NULL DEFAULT 'PENDING_REVIEW',
+  audit_status VARCHAR(24) NOT NULL DEFAULT 'PENDING',
+  audit_reason VARCHAR(255),
+  version INT NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_item_status_category_time (status, category_id, created_at),
+  KEY idx_item_price (price)
+);
+
+CREATE TABLE IF NOT EXISTS item_image (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  item_id BIGINT NOT NULL,
+  image_url VARCHAR(512) NOT NULL,
+  sort_no INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS trade_order (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  item_id BIGINT NOT NULL,
+  buyer_id BIGINT NOT NULL,
+  seller_id BIGINT NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  receiver_name VARCHAR(64) NOT NULL,
+  receiver_phone VARCHAR(32) NOT NULL,
+  receiver_campus VARCHAR(64) NOT NULL,
+  receiver_detail VARCHAR(255) NOT NULL,
+  payment_method VARCHAR(24),
+  payment_no VARCHAR(64),
+  cancel_reason VARCHAR(255),
+  status VARCHAR(24) NOT NULL DEFAULT 'PENDING_PAYMENT',
+  paid_at DATETIME,
+  shipped_at DATETIME,
+  completed_at DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_order_buyer_status_time (buyer_id, status, created_at),
+  KEY idx_order_seller_status_time (seller_id, status, created_at)
+);
+
+CREATE TABLE IF NOT EXISTS conversation (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_a BIGINT NOT NULL,
+  user_b BIGINT NOT NULL,
+  last_message_at DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS message (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  conversation_id BIGINT NOT NULL,
+  from_user BIGINT NOT NULL,
+  to_user BIGINT NOT NULL,
+  order_id BIGINT,
+  item_id BIGINT,
+  message_type VARCHAR(16) NOT NULL DEFAULT 'TEXT',
+  content TEXT NOT NULL,
+  read_status TINYINT NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_message_conversation_time (conversation_id, created_at)
+);
+
+CREATE TABLE IF NOT EXISTS user_hidden_order (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  order_id BIGINT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_hidden_order_user_order (user_id, order_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_hidden_thread (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  order_id BIGINT NOT NULL DEFAULT 0,
+  item_id BIGINT NOT NULL DEFAULT 0,
+  hidden_before DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_hidden_thread_user_scope (user_id, order_id, item_id)
+);
+
+CREATE TABLE IF NOT EXISTS review (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  from_user BIGINT NOT NULL,
+  to_user BIGINT NOT NULL,
+  score INT NOT NULL,
+  content VARCHAR(500),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS favorite (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  item_id BIGINT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_favorite_user_item (user_id, item_id)
+);
+
+CREATE TABLE IF NOT EXISTS browse_history (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  item_id BIGINT NOT NULL,
+  browsed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_history_user_time (user_id, browsed_at)
+);
+
+CREATE TABLE IF NOT EXISTS wanted_post (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  description VARCHAR(500) NOT NULL,
+  budget DECIMAL(10, 2) NOT NULL,
+  status VARCHAR(24) NOT NULL DEFAULT 'OPEN',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS report_record (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  reporter_id BIGINT NOT NULL,
+  target_type VARCHAR(24) NOT NULL,
+  target_id BIGINT NOT NULL,
+  reason VARCHAR(255) NOT NULL,
+  status VARCHAR(24) NOT NULL DEFAULT 'PENDING',
+  handle_result VARCHAR(255),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS dispute_record (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  complainant_id BIGINT NOT NULL,
+  reason VARCHAR(255) NOT NULL,
+  order_status_snapshot VARCHAR(24) NOT NULL DEFAULT 'PAID',
+  status VARCHAR(24) NOT NULL DEFAULT 'PENDING',
+  handle_result VARCHAR(255),
+  handler_id BIGINT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  handled_at DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS admin_user (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(64) NOT NULL,
+  password_md5 VARCHAR(64) NOT NULL,
+  status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+  last_login_at DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  actor_id BIGINT NOT NULL,
+  action_type VARCHAR(64) NOT NULL,
+  target_type VARCHAR(64) NOT NULL,
+  target_id BIGINT NOT NULL,
+  detail VARCHAR(500),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,40 @@
+<view class="page sticky-safe">
+  <view wx:if="{{item}}" class="card">
+    <view class="goods-cover" style="height: 420rpx;">
+      <image wx:if="{{selectedImage}}" class="cover-image" src="{{selectedImage}}" mode="aspectFill" />
+      <view wx:else class="goods-placeholder">暂无图片</view>
+      <view class="tag">{{item.category || '未分类'}}</view>
+      <view class="status-tag">{{item.statusText || '在售'}}</view>
+    </view>
+    <view wx:if="{{gallery.length}}" class="gallery-strip">
+      <view wx:for="{{gallery}}" wx:key="*this" class="gallery-thumb {{selectedImage === item ? 'active' : ''}}" bindtap="selectImage" data-url="{{item}}">
+        <image class="cover-image" src="{{item}}" mode="aspectFill" />
+      </view>
+    </view>
+    <view class="section-title" style="margin-top: 18rpx;">{{item.title}}</view>
+    <view class="price">￥{{item.price}}</view>
+    <view class="muted">卖家：{{item.sellerName || '校园用户'}} · 库存 {{item.stock}} 件</view>
+    <view class="muted">{{item.description || '暂无更多说明'}}</view>
+    <view class="button-row" style="margin-top: 18rpx;">
+      <button class="btn-secondary" bindtap="toggleFavorite">{{favoriteItemIds.includes(item.id) ? '取消收藏' : '加入收藏'}}</button>
+      <button class="btn-secondary" bindtap="addCart">加入购物车</button>
+      <button class="btn-primary" bindtap="createOrder">直接下单</button>
+    </view>
+    <view class="button-row" style="margin-top: 16rpx;">
+      <button class="btn-secondary" bindtap="openMessages">咨询卖家</button>
+      <button class="btn-danger" bindtap="submitReport">提交举报</button>
+    </view>
+  </view>
+
+  <view wx:if="{{item}}" class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">举报商品</view>
+        <view class="section-subtitle">举报后商品会进入管理员审核流程</view>
+      </view>
+    </view>
+    <textarea class="field-textarea" placeholder-class="textarea-placeholder" placeholder="请填写举报原因，例如虚假描述、违禁物品、恶意价格等" value="{{reportReason}}" bindinput="onReportInput"></textarea>
+  </view>
+
+  <view wx:else class="card empty-box">商品详情加载失败或已下架。</view>
+</view>

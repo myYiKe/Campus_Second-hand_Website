@@ -1,0 +1,61 @@
+<view class="page">
+  <view wx:if="{{!loggedIn}}" class="card promo-banner">
+    <view class="promo-title">登录后发布闲置商品</view>
+    <view class="sub-title">小程序端使用昵称密码登录，登录后可直接复用网页端发布接口。</view>
+    <view class="promo-actions">
+      <view class="btn-primary" bindtap="goLogin">去登录</view>
+    </view>
+  </view>
+
+  <block wx:else>
+    <view class="card">
+      <view class="section-title">发布闲置</view>
+      <view class="form-grid">
+        <view class="field-block">
+          <view class="field-label">商品标题</view>
+          <input class="field-input" placeholder-class="input-placeholder" value="{{form.title}}" data-field="title" bindinput="onFieldInput" placeholder="例如 2024款 iPad Air 5" />
+        </view>
+        <view class="field-block">
+          <view class="field-label">分类</view>
+          <picker range="{{categoryOptions}}" bindchange="onCategoryChange">
+            <view class="field-picker">{{form.category}}</view>
+          </picker>
+        </view>
+        <view class="field-block">
+          <view class="field-label">价格</view>
+          <input class="field-input" placeholder-class="input-placeholder" value="{{form.price}}" data-field="price" bindinput="onFieldInput" type="digit" placeholder="0.00" />
+        </view>
+        <view class="field-block">
+          <view class="field-label">库存</view>
+          <input class="field-input" placeholder-class="input-placeholder" value="{{form.stock}}" data-field="stock" bindinput="onFieldInput" type="number" placeholder="1" />
+        </view>
+        <view class="field-block">
+          <view class="field-label">商品描述</view>
+          <textarea class="field-textarea" placeholder-class="textarea-placeholder" value="{{form.description}}" data-field="description" bindinput="onFieldInput" placeholder="写清购入年份、成色、配件情况"></textarea>
+        </view>
+        <view class="field-block">
+          <view class="field-label">商品图片</view>
+          <view class="section-subtitle">最多上传 6 张，第一张会作为商品封面</view>
+          <button class="btn-secondary" bindtap="chooseImages">选择图片</button>
+          <view wx:if="{{imageFiles.length}}" class="upload-grid">
+            <view wx:for="{{imageFiles}}" wx:key="path" class="upload-card">
+              <view class="upload-thumb" bindtap="previewImage" data-url="{{item.path}}">
+                <image class="upload-image" src="{{item.path}}" mode="aspectFill" />
+              </view>
+              <view class="upload-actions">
+                <button class="mini-danger" bindtap="removeImage" data-index="{{index}}">删除</button>
+              </view>
+            </view>
+          </view>
+          <view wx:else class="empty-box">还没有上传图片，请先选择商品实拍图。</view>
+        </view>
+        <button class="btn-primary btn-block" bindtap="submitPublish">提交审核</button>
+      </view>
+    </view>
+
+    <view class="card promo-banner">
+      <view class="section-title">发布提示</view>
+      <view class="sub-title">建议优先上传近几年常见商品，例如平板、教材、宿舍家电、护眼台灯和轻量电动车。</view>
+    </view>
+  </block>
+</view>

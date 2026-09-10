@@ -1,0 +1,3 @@
+.gallery-strip {
+  overflow-x: auto;
+}

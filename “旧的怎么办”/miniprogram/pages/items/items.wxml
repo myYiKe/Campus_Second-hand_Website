@@ -1,0 +1,52 @@
+<view class="page sticky-safe">
+  <view class="card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">商品频道</view>
+        <view class="section-subtitle">完整商品列表与筛选能力</view>
+      </view>
+    </view>
+    <view class="search-row">
+      <input class="field-input" placeholder-class="input-placeholder" placeholder="搜索商品名称" value="{{keyword}}" bindinput="onKeywordInput" confirm-type="search" bindconfirm="onSearch" />
+      <button class="btn-primary" bindtap="onSearch">搜索</button>
+    </view>
+    <view class="button-row" style="margin-top: 16rpx;">
+      <picker range="{{campusOptions}}" bindchange="onCampusChange">
+        <view class="btn-secondary">{{currentCampus}}</view>
+      </picker>
+    </view>
+    <scroll-view scroll-x class="chip-row category-scroll" style="margin-top: 16rpx;">
+      <view wx:for="{{categories}}" wx:key="*this" class="chip {{(currentCategory || '全部商品') === item ? 'active' : ''}}" data-category="{{item}}" bindtap="onCategoryTap">
+        {{item}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="goods-grid">
+    <view wx:for="{{items}}" wx:key="id" class="goods-card" bindtap="viewItem" data-id="{{item.id}}">
+      <view class="goods-cover">
+        <image wx:if="{{item.imageUrl}}" class="goods-image" src="{{item.imageUrl}}" mode="aspectFill" />
+        <view wx:else class="goods-placeholder">暂无图片</view>
+        <view class="tag">{{item.category || '未分类'}}</view>
+        <view class="status-tag">{{item.statusText || '在售'}}</view>
+      </view>
+      <view class="goods-body">
+        <view class="goods-title">{{item.title}}</view>
+        <view class="goods-desc">{{item.description || '支持校内面交与在线沟通确认'}}</view>
+        <view class="goods-meta">卖家：{{item.sellerName || '校园用户'}}</view>
+        <view class="goods-meta">库存：{{item.stock}} 件</view>
+        <view class="price-row">
+          <view class="price">￥{{item.price}}</view>
+        </view>
+        <view class="goods-actions">
+          <button class="mini-outline mini-compact" catchtap="toggleFavorite" data-id="{{item.id}}">
+            {{favoriteItemIds.includes(item.id) ? '已收藏' : '收藏'}}
+          </button>
+          <button class="mini-solid mini-compact" catchtap="addCart" data-id="{{item.id}}">加购</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!items.length}}" class="card empty-box">{{loading ? '商品加载中...' : '暂无商品，请稍后刷新。'}}</view>
+</view>
